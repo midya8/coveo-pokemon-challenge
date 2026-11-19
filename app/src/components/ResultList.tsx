@@ -3,6 +3,8 @@ import {
   buildQuerySummary,
   buildResultList,
   buildSearchBox,
+  loadSearchActions,
+  loadSearchAnalyticsActions,
   type Result,
   type SearchEngine,
 } from '@coveo/headless';
@@ -26,16 +28,27 @@ export function ResultList({ engine }: { engine: SearchEngine }) {
 
   if (state.hasError) {
     return (
-      <p className="notice error" role="alert">
-        Search failed. Check the organization id and the search token.
-      </p>
+      <div className="empty" role="alert">
+        <h2>Search failed</h2>
+        <p>The search request did not succeed. Check the organization id and the search token, then try again.</p>
+        <button type="button" onClick={() => retrySearch(engine)}>
+          Try again
+        </button>
+      </div>
     );
   }
   if (state.isLoading && !state.results.length) {
     return (
-      <p className="notice" role="status">
-        Searching…
-      </p>
+      <>
+        <p className="visually-hidden" role="status">
+          Searching…
+        </p>
+        <ul className="skeleton" aria-hidden="true">
+          {Array.from({ length: 6 }, (_, index) => (
+            <li key={index} />
+          ))}
+        </ul>
+      </>
     );
   }
   if (!state.results.length && state.firstSearchExecuted) {
@@ -49,6 +62,12 @@ export function ResultList({ engine }: { engine: SearchEngine }) {
       ))}
     </ul>
   );
+}
+
+function retrySearch(engine: SearchEngine) {
+  const { executeSearch } = loadSearchActions(engine);
+  const { logSearchboxSubmit } = loadSearchAnalyticsActions(engine);
+  void engine.dispatch(executeSearch(logSearchboxSubmit()));
 }
 
 function EmptyState({ engine }: { engine: SearchEngine }) {

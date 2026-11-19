@@ -17,7 +17,17 @@ export function Facet({ engine, options, title, hint, renderValue }: Props) {
   const facetId = options.facetId ?? options.field;
   const state = useController(controller);
 
-  if (!state.values.length) return null;
+  if (!state.values.length) {
+    if (!state.isLoading) return null;
+    return (
+      <section className="facet" aria-labelledby={`${facetId}-title`} aria-busy="true">
+        <h3 id={`${facetId}-title`}>{title}</h3>
+        <p className="facet-hint" role="status">
+          Loading {title.toLowerCase()}…
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="facet" aria-labelledby={`${facetId}-title`} aria-describedby={hint ? `${facetId}-hint` : undefined}>

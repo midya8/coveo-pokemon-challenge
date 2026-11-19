@@ -2,7 +2,7 @@
   --bg: #f6f7fb;
   --surface: #ffffff;
   --text: #1d2433;
-  --muted: #667085;
+  --muted: #3e4c63;
   --border: #e4e7ec;
   --accent: #e3350d;
   --accent-ink: #ffffff;
@@ -18,7 +18,7 @@
     --bg: #12151c;
     --surface: #1b2029;
     --text: #e8ebf2;
-    --muted: #9aa3b2;
+    --muted: #d5dbe6;
     --border: #2b3240;
   }
 }
@@ -134,11 +134,12 @@ button { font: inherit; cursor: pointer; }
 /* Type badges (standard Pokémon type palette) */
 .type-badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; color: #fff; text-shadow: 0 1px 1px rgb(0 0 0 / 0.25); background: #777; }
 .type-normal { background: #a8a77a; } .type-fire { background: #ee8130; } .type-water { background: #6390f0; }
-.type-electric { background: #d9b500; } .type-grass { background: #5fa83a; } .type-ice { background: #57c4c0; }
-.type-fighting { background: #c22e28; } .type-poison { background: #a33ea1; } .type-ground { background: #c9a649; }
+.type-electric { background: #d9b500; } .type-grass { background: #5fa83a; } .type-ice { background: #3aa9a5; }
+.type-fighting { background: #c22e28; } .type-poison { background: #a33ea1; } .type-ground { background: #a4842a; }
 .type-flying { background: #8f78e0; } .type-psychic { background: #f95587; } .type-bug { background: #8d9c1a; }
 .type-rock { background: #b6a136; } .type-ghost { background: #735797; } .type-dragon { background: #6f35fc; }
-.type-dark { background: #705746; } .type-steel { background: #8f8fae; } .type-fairy { background: #d685ad; }
+.type-dark { background: #705746; } .type-steel { background: #6f6f8e; } .type-fairy { background: #b85d8e; }
+.type-electric, .type-ground { color: #1d2433; text-shadow: none; }
 
 /* Detail page */
 .back { display: inline-block; margin-bottom: 16px; color: var(--focus); text-decoration: none; }
@@ -195,4 +196,21 @@ button { font: inherit; cursor: pointer; }
 @media (max-width: 760px) {
   .facet li label { padding: 8px 0; }
   .searchbox > button, .empty button { min-height: 44px; }
+}
+.skeleton {
+  list-style: none; padding: 0; margin: 16px 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;
+}
+.skeleton li {
+  height: 280px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton li { animation: pulse 1.2s ease-in-out infinite; }
+}
+@keyframes pulse {
+  50% { opacity: 0.55; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card a { transition: none; }
+  .card a:hover { transform: none; }
 }

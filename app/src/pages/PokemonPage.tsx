@@ -6,6 +6,7 @@ import { asList } from '../coveo/fields';
 import { FIELDS_TO_INCLUDE, IS_SAMPLE_ORG, POKEDEX_URL_PREFIX, SOURCE_FILTER } from '../coveo/config';
 import { createEngine } from '../coveo/engine';
 import { useController } from '../hooks/useController';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 const STATS: { field: string; label: string }[] = [
   { field: 'pokemon_hp', label: 'HP' },
@@ -35,6 +36,9 @@ export function PokemonPage() {
   }, [uri]);
   const state = useController(resultList);
   const result = state.results[0];
+  const raw = (result?.raw ?? {}) as Record<string, unknown>;
+  const name = (typeof raw.pokemon_name === 'string' && raw.pokemon_name) || result?.title;
+  useDocumentTitle(name);
 
   if (IS_SAMPLE_ORG) {
     return (
@@ -46,8 +50,6 @@ export function PokemonPage() {
   if (!state.firstSearchExecuted || state.isLoading) return <Page><p className="notice">Loading…</p></Page>;
   if (!result) return <Page><p className="notice">No Pokémon found for “{slug}”.</p></Page>;
 
-  const raw = result.raw as Record<string, unknown>;
-  const name = (raw.pokemon_name as string) || result.title;
   const total = raw.pokemon_total as number | undefined;
 
   return (

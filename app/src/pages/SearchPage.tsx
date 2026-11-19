@@ -1,5 +1,5 @@
-import { buildUrlManager } from '@coveo/headless';
-import { useEffect } from 'react';
+import { buildQuerySummary, buildUrlManager } from '@coveo/headless';
+import { useEffect, useMemo } from 'react';
 import { Facet } from '../components/Facet';
 import { GeneratedAnswer } from '../components/GeneratedAnswer';
 import { PassageRetrieval } from '../components/PassageRetrieval';
@@ -10,10 +10,15 @@ import { TypeBadge } from '../components/TypeBadge';
 import { IS_SAMPLE_ORG } from '../coveo/config';
 import { searchEngine } from '../coveo/engine';
 import { abilitiesFacet, generationFacet, typeFacet } from '../coveo/facetOptions';
+import { useController } from '../hooks/useController';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 let firstSearchDone = false;
 
 export function SearchPage() {
+  const summaryController = useMemo(() => buildQuerySummary(searchEngine), []);
+  const summary = useController(summaryController);
+  useDocumentTitle(summary.hasQuery ? summary.query : undefined);
   // Keep search state in the URL hash so searches are shareable and survive Back from a detail page.
   useEffect(() => {
     const fragment = () => window.location.hash.slice(1);
