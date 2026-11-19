@@ -112,7 +112,7 @@ function ResultCard({ engine, result, showExcerpt }: { engine: SearchEngine; res
   const body = (
     <>
       <div className="art">
-        {image ? <img src={image} alt="" loading="lazy" /> : <div className="art-placeholder">?</div>}
+        {image ? <img src={image} alt="" width={240} height={240} loading="lazy" /> : <div className="art-placeholder">?</div>}
       </div>
       <div className="meta">
         {showNumber && <span className="dex-no">#{String(number).padStart(4, '0')}</span>}

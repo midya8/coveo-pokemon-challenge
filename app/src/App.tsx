@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
-import { PokemonPage } from './pages/PokemonPage';
 import { SearchPage } from './pages/SearchPage';
+
+const PokemonPage = lazy(() => import('./pages/PokemonPage').then((module) => ({ default: module.PokemonPage })));
 
 /** Remember the search-page hash so the detail page's Back link restores the same search. */
 function RememberSearchHash() {
@@ -31,11 +32,13 @@ export default function App() {
         </Link>
         <span className="powered">powered by Coveo</span>
       </header>
-      <Routes>
-        <Route path="/" element={<SearchPage />} />
-        <Route path="/pokemon/:slug" element={<PokemonPage />} />
-        <Route path="*" element={<SearchPage />} />
-      </Routes>
+      <Suspense fallback={<p className="notice search-page">Loading…</p>}>
+        <Routes>
+          <Route path="/" element={<SearchPage />} />
+          <Route path="/pokemon/:slug" element={<PokemonPage />} />
+          <Route path="*" element={<SearchPage />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

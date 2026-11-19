@@ -45,7 +45,7 @@ flowchart LR
 | [`coveo-config/`](coveo-config/) | Source settings, web-scraping config, field definitions, and the query-pipeline statements. The field-by-field catalog is [docs/FIELDS.md](docs/FIELDS.md). |
 | [`tools/`](tools/) | Scraping validator, org setup, analytics seeding, pipeline apply, and an index check for the Fire + Flying demo. |
 
-Headless rather than Atomic: the result card (artwork, types, stats), the generation facet in natural order (`Generation 1` … `Generation 10`), and the `/pokemon/:slug` detail route are all custom. Atomic would have meant fighting its result template and router. The engine uses `getOrganizationEndpoints` so search and analytics follow the org’s regional endpoints.
+Headless rather than Atomic: the result card (artwork, types, stats), the generation facet in natural order (`Generation 1` … `Generation 10`), and the `/pokemon/:slug` detail route are all custom. Atomic would have meant fighting its result template and router. The engine uses `getOrganizationEndpoints` so search and analytics follow the org’s regional endpoints. `@coveo/headless` is one prebuilt bundle, so it stays on the first load. The detail route is loaded only when a card is opened.
 
 ## Setup
 
