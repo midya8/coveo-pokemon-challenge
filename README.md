@@ -58,6 +58,7 @@ Without a search token the UI still boots, against Coveo’s public sample organ
 npm run lint
 npm test
 npm run build
+npm run e2e             # Playwright: Fire + Flying shows Charizard, and an empty suggestion list falls back
 ```
 
 GitHub Actions runs those three, plus `python -m unittest tools/test_pipeline_plan.py`. No Coveo credentials are required in CI.
