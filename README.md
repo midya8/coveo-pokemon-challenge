@@ -19,6 +19,8 @@ Passage Retrieval is not licensed on this trial. The results column says so, in 
 
 ## Architecture
 
+How the pieces fit, and why the non-obvious choices were made, is written up in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/DECISIONS.md](docs/DECISIONS.md).
+
 ```mermaid
 flowchart LR
   subgraph browser [Browser]
