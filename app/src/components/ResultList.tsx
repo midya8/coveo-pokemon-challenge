@@ -1,14 +1,18 @@
 import {
   buildInteractiveResult,
+  buildQuerySummary,
   buildResultList,
+  buildSearchBox,
   type Result,
   type SearchEngine,
 } from '@coveo/headless';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { FIELDS_TO_INCLUDE, slugFromUri } from '../coveo/config';
+import { SEARCH_BOX_OPTIONS } from '../coveo/searchBoxOptions';
 import { useController } from '../hooks/useController';
 import { asList } from '../coveo/fields';
+import { HighlightedText } from './HighlightedText';
 import { TypeBadge } from './TypeBadge';
 
 export function ResultList({ engine }: { engine: SearchEngine }) {
@@ -16,50 +20,99 @@ export function ResultList({ engine }: { engine: SearchEngine }) {
     () => buildResultList(engine, { options: { fieldsToInclude: FIELDS_TO_INCLUDE } }),
     [engine],
   );
+  const summaryController = useMemo(() => buildQuerySummary(engine), [engine]);
   const state = useController(controller);
+  const summary = useController(summaryController);
 
-  if (state.hasError) return <p className="notice error">Search failed. Check the org configuration.</p>;
-  if (!state.results.length && state.firstSearchExecuted && !state.isLoading) {
-    return <p className="notice">No Pokémon match that search.</p>;
+  if (state.hasError) {
+    return (
+      <p className="notice error" role="alert">
+        Search failed. Check the organization id and the search token.
+      </p>
+    );
+  }
+  if (state.isLoading && !state.results.length) {
+    return (
+      <p className="notice" role="status">
+        Searching…
+      </p>
+    );
+  }
+  if (!state.results.length && state.firstSearchExecuted) {
+    return <EmptyState engine={engine} />;
   }
 
   return (
-    <ul className="results">
+    <ul className="results" aria-busy={state.isLoading}>
       {state.results.map((result) => (
-        <ResultCard key={result.uniqueId} engine={engine} result={result} />
+        <ResultCard key={result.uniqueId} engine={engine} result={result} showExcerpt={summary.hasQuery} />
       ))}
     </ul>
   );
 }
 
-function ResultCard({ engine, result }: { engine: SearchEngine; result: Result }) {
+function EmptyState({ engine }: { engine: SearchEngine }) {
+  const box = useMemo(() => buildSearchBox(engine, { options: SEARCH_BOX_OPTIONS }), [engine]);
+  return (
+    <div className="empty" role="status">
+      <h2>No Pokémon match</h2>
+      <p>
+        Try another name, or clear the query and filters. Selecting more than one type keeps only Pokémon that have
+        every one of those types.
+      </p>
+      <button
+        type="button"
+        onClick={() => {
+          box.clear();
+          box.submit();
+        }}
+      >
+        Clear search and filters
+      </button>
+    </div>
+  );
+}
+
+function ResultCard({ engine, result, showExcerpt }: { engine: SearchEngine; result: Result; showExcerpt: boolean }) {
   const interactive = useMemo(
     () => buildInteractiveResult(engine, { options: { result } }),
     [engine, result],
   );
   const raw = result.raw as Record<string, unknown>;
-  const name = (raw.pokemon_name as string) || result.title;
+  const name = (typeof raw.pokemon_name === 'string' && raw.pokemon_name) || result.title;
   const number = raw.pokemon_number as number | string | undefined;
-  const image = raw.pokemon_image as string | undefined;
+  const image = typeof raw.pokemon_image === 'string' ? raw.pokemon_image : undefined;
   const types = asList(raw.pokemon_type);
-  const generation = raw.pokemon_generation as string | undefined;
+  const generation = typeof raw.pokemon_generation === 'string' ? raw.pokemon_generation : undefined;
+  const species = typeof raw.pokemon_species === 'string' ? raw.pokemon_species : undefined;
+  const total = typeof raw.pokemon_total === 'number' ? raw.pokemon_total : undefined;
   const slug = slugFromUri(result.clickUri);
   const href = slug ? `/pokemon/${slug}` : result.clickUri;
+  const showNumber = number !== undefined && number !== '' && Number(number) !== 0;
 
   const body = (
     <>
       <div className="art">
-        {image ? <img src={image} alt={name} loading="lazy" /> : <div className="art-placeholder">?</div>}
+        {image ? <img src={image} alt="" loading="lazy" /> : <div className="art-placeholder">?</div>}
       </div>
       <div className="meta">
-        {number !== undefined && <span className="dex-no">#{String(number).padStart(4, '0')}</span>}
+        {showNumber && <span className="dex-no">#{String(number).padStart(4, '0')}</span>}
         <h2>{name}</h2>
+        {species && <p className="species">{species}</p>}
         <div className="types">
           {types.map((t) => (
             <TypeBadge key={t} type={t} />
           ))}
         </div>
-        {generation && <span className="gen">{generation}</span>}
+        <p className="card-sub">
+          {generation && <span className="gen">{generation}</span>}
+          {total !== undefined && <span className="total">BST {total}</span>}
+        </p>
+        {showExcerpt && result.excerpt && (
+          <p className="excerpt">
+            <HighlightedText text={result.excerpt} highlights={result.excerptHighlights} />
+          </p>
+        )}
       </div>
     </>
   );

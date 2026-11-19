@@ -1,5 +1,7 @@
 import {
   SortOrder,
+  buildBreadcrumbManager,
+  buildDidYouMean,
   buildFieldSortCriterion,
   buildPager,
   buildQuerySummary,
@@ -8,19 +10,33 @@ import {
   type SearchEngine,
 } from '@coveo/headless';
 import { useMemo } from 'react';
-import { FIELDS } from '../coveo/config';
+import { FIELDS, IS_SAMPLE_ORG } from '../coveo/config';
 import { useController } from '../hooks/useController';
 
 export function QuerySummary({ engine }: { engine: SearchEngine }) {
   const controller = useMemo(() => buildQuerySummary(engine), [engine]);
   const s = useController(controller);
-  if (!s.hasResults) return null;
+  if (!s.firstSearchExecuted) return null;
+  if (!s.hasResults) {
+    return (
+      <p className="summary" aria-live="polite">
+        No Pokémon
+        {s.hasQuery && (
+          <>
+            {' '}
+            for <strong>{s.query}</strong>
+          </>
+        )}
+      </p>
+    );
+  }
   return (
-    <p className="summary">
+    <p className="summary" aria-live="polite">
       {s.firstResult}–{s.lastResult} of {s.total.toLocaleString()} Pokémon
       {s.hasQuery && (
         <>
-          {' '}for <strong>{s.query}</strong>
+          {' '}
+          for <strong>{s.query}</strong>
         </>
       )}
       <span className="duration"> · {s.durationInSeconds}s</span>
@@ -31,6 +47,12 @@ export function QuerySummary({ engine }: { engine: SearchEngine }) {
 const SORTS = [
   { label: 'Relevance', criterion: buildRelevanceSortCriterion() },
   { label: 'Pokédex number', criterion: buildFieldSortCriterion(FIELDS.number, SortOrder.Ascending) },
+  ...(IS_SAMPLE_ORG
+    ? []
+    : [
+        { label: 'Name', criterion: buildFieldSortCriterion('pokemon_name', SortOrder.Ascending) },
+        { label: 'Stat total', criterion: buildFieldSortCriterion('pokemon_total', SortOrder.Descending) },
+      ]),
 ];
 
 export function SortSelect({ engine }: { engine: SearchEngine }) {
@@ -82,5 +104,62 @@ export function Pager({ engine }: { engine: SearchEngine }) {
         Next ›
       </button>
     </nav>
+  );
+}
+
+export function Breadcrumbs({ engine }: { engine: SearchEngine }) {
+  const controller = useMemo(() => buildBreadcrumbManager(engine), [engine]);
+  const state = useController(controller);
+  if (!state.hasBreadcrumbs) return null;
+  const selected = state.facetBreadcrumbs.flatMap((facet) =>
+    facet.values.map((breadcrumb) => ({
+      facetId: facet.facetId,
+      label: breadcrumb.value.value,
+      deselect: () => breadcrumb.deselect(),
+    })),
+  );
+  if (!selected.length) return null;
+  return (
+    <div className="breadcrumbs" aria-label="Active filters">
+      {selected.map((item) => (
+        <button key={`${item.facetId}-${item.label}`} type="button" className="chip" onClick={item.deselect}>
+          {item.label}
+          <span aria-hidden="true"> ×</span>
+          <span className="visually-hidden">Remove {item.label}</span>
+        </button>
+      ))}
+      <button type="button" className="link" onClick={() => controller.deselectAll()}>
+        Clear filters
+      </button>
+    </div>
+  );
+}
+
+export function DidYouMean({ engine }: { engine: SearchEngine }) {
+  const controller = useMemo(
+    () =>
+      buildDidYouMean(engine, {
+        options: { automaticallyCorrectQuery: false, queryCorrectionMode: 'legacy' },
+      }),
+    [engine],
+  );
+  const state = useController(controller);
+  if (state.wasAutomaticallyCorrected && state.wasCorrectedTo) {
+    return (
+      <p className="did-you-mean" role="status">
+        Showing results for <strong>{state.wasCorrectedTo}</strong>
+        {state.originalQuery ? <> instead of {state.originalQuery}</> : null}.
+      </p>
+    );
+  }
+  if (!state.hasQueryCorrection || !state.queryCorrection.correctedQuery) return null;
+  return (
+    <p className="did-you-mean">
+      Did you mean{' '}
+      <button type="button" className="link" onClick={() => controller.applyCorrection()}>
+        {state.queryCorrection.correctedQuery}
+      </button>
+      ?
+    </p>
   );
 }

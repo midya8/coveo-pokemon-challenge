@@ -22,6 +22,9 @@ export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <RememberSearchHash />
+      <a className="skip" href="#results">
+        Skip to results
+      </a>
       <header className="site-header">
         <Link to="/" className="brand">
           <span className="ball" aria-hidden="true" /> Pokédex Search

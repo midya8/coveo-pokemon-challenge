@@ -57,7 +57,7 @@ export function PokemonPage() {
           {raw.pokemon_image ? <img src={raw.pokemon_image as string} alt={name} /> : null}
         </div>
         <div className="detail-body">
-          {raw.pokemon_number !== undefined && (
+          {raw.pokemon_number !== undefined && Number(raw.pokemon_number) !== 0 && (
             <span className="dex-no">#{String(raw.pokemon_number).padStart(4, '0')}</span>
           )}
           <h1>{name}</h1>
@@ -129,12 +129,12 @@ export function PokemonPage() {
 
 function Page({ children }: { children: React.ReactNode }) {
   return (
-    <div className="detail-page">
+    <main id="results" className="detail-page">
       <Link to={{ pathname: '/', hash: sessionStorageSafeHash() }} className="back">
         ← Back to search
       </Link>
       {children}
-    </div>
+    </main>
   );
 }
 

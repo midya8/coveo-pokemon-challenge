@@ -1,0 +1,44 @@
+[
+  {
+    "description": "pokemon-challenge: production source only",
+    "feature": "filter",
+    "definition": "@source==\"Pokemon - pokemondb.net\""
+  },
+  {
+    "description": "pokemon-challenge: charizard aliases",
+    "feature": "thesaurus",
+    "definition": "alias \"charizard\", \"fire lizard\""
+  },
+  {
+    "description": "pokemon-challenge: pikachu aliases",
+    "feature": "thesaurus",
+    "definition": "alias \"pikachu\", \"electric mouse\""
+  },
+  {
+    "description": "pokemon-challenge: legendary names",
+    "feature": "thesaurus",
+    "definition": "expand \"legendary\" to \"mewtwo\", \"mew\", \"lugia\", \"ho-oh\", \"rayquaza\""
+  },
+  {
+    "description": "pokemon-challenge: query mentions fire lizard",
+    "feature": "when",
+    "definition": "when $query contains \"fire lizard\""
+  },
+  {
+    "description": "pokemon-challenge: feature Charizard for fire lizard",
+    "feature": "top",
+    "definition": "featured result `@uri==\"https://pokemondb.net/pokedex/charizard\"`",
+    "parentDescription": "pokemon-challenge: query mentions fire lizard"
+  },
+  {
+    "description": "pokemon-challenge: query asks for strong pokemon",
+    "feature": "when",
+    "definition": "when $query contains \"strong\""
+  },
+  {
+    "description": "pokemon-challenge: boost high base stat totals",
+    "feature": "ranking",
+    "definition": "boost `@pokemon_total>500` by 100",
+    "parentDescription": "pokemon-challenge: query asks for strong pokemon"
+  }
+]
