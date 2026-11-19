@@ -7,3 +7,6 @@ dist/
 tools/.venv/
 tools/.cache/
 __pycache__/
+
+# Private notes (interview details) - never publish
+HANDOFF.md
