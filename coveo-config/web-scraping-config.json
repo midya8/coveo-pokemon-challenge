@@ -1,0 +1,85 @@
+[
+  {
+    "name": "Pokemon detail pages",
+    "for": {
+      "urls": ["^https://pokemondb\\.net/pokedex/(?!all$|national$|shiny$)[a-z0-9-]+$"]
+    },
+    "exclude": [
+      { "type": "CSS", "path": "header.main-header" },
+      { "type": "CSS", "path": "nav" },
+      { "type": "CSS", "path": "footer.main-footer" },
+      { "type": "CSS", "path": "#dex-sprites + *" },
+      { "type": "CSS", "path": "#dex-lang + *" }
+    ],
+    "metadata": {
+      "pokemon_name": {
+        "type": "XPATH",
+        "path": "//main//h1/text()"
+      },
+      "pokemon_number": {
+        "type": "XPATH",
+        "path": "((//div[starts-with(@id,'tab-basic-')])[1]//table[contains(@class,'vitals-table')])[1]//tr[contains(th,'National')]/td/strong/text()"
+      },
+      "pokemon_type": {
+        "type": "XPATH",
+        "path": "((//div[starts-with(@id,'tab-basic-')])[1]//table[contains(@class,'vitals-table')])[1]//tr[th='Type']/td/a/text()"
+      },
+      "pokemon_generation": {
+        "type": "XPATH",
+        "path": "(//main//p[contains(.,'introduced in')]/abbr)[1]/text()"
+      },
+      "pokemon_species": {
+        "type": "XPATH",
+        "path": "((//div[starts-with(@id,'tab-basic-')])[1]//table[contains(@class,'vitals-table')])[1]//tr[th='Species']/td/text()"
+      },
+      "pokemon_height": {
+        "type": "XPATH",
+        "path": "((//div[starts-with(@id,'tab-basic-')])[1]//table[contains(@class,'vitals-table')])[1]//tr[th='Height']/td/text()"
+      },
+      "pokemon_weight": {
+        "type": "XPATH",
+        "path": "((//div[starts-with(@id,'tab-basic-')])[1]//table[contains(@class,'vitals-table')])[1]//tr[th='Weight']/td/text()"
+      },
+      "pokemon_abilities": {
+        "type": "XPATH",
+        "path": "((//div[starts-with(@id,'tab-basic-')])[1]//table[contains(@class,'vitals-table')])[1]//tr[th='Abilities']/td//a/text()"
+      },
+      "pokemon_image": {
+        "type": "XPATH",
+        "path": "//meta[@property='og:image']/@content"
+      },
+      "pokemon_forms": {
+        "type": "XPATH",
+        "path": "(//div[contains(@class,'sv-tabs-tab-list')])[1]/a/text()"
+      },
+      "pokemon_hp": {
+        "type": "XPATH",
+        "path": "(//div[starts-with(@id,'tab-basic-')])[1]//h2[.='Base stats']/following-sibling::div[1]//tr[th='HP']/td[1]/text()"
+      },
+      "pokemon_attack": {
+        "type": "XPATH",
+        "path": "(//div[starts-with(@id,'tab-basic-')])[1]//h2[.='Base stats']/following-sibling::div[1]//tr[th='Attack']/td[1]/text()"
+      },
+      "pokemon_defense": {
+        "type": "XPATH",
+        "path": "(//div[starts-with(@id,'tab-basic-')])[1]//h2[.='Base stats']/following-sibling::div[1]//tr[th='Defense']/td[1]/text()"
+      },
+      "pokemon_sp_atk": {
+        "type": "XPATH",
+        "path": "(//div[starts-with(@id,'tab-basic-')])[1]//h2[.='Base stats']/following-sibling::div[1]//tr[th='Sp. Atk']/td[1]/text()"
+      },
+      "pokemon_sp_def": {
+        "type": "XPATH",
+        "path": "(//div[starts-with(@id,'tab-basic-')])[1]//h2[.='Base stats']/following-sibling::div[1]//tr[th='Sp. Def']/td[1]/text()"
+      },
+      "pokemon_speed": {
+        "type": "XPATH",
+        "path": "(//div[starts-with(@id,'tab-basic-')])[1]//h2[.='Base stats']/following-sibling::div[1]//tr[th='Speed']/td[1]/text()"
+      },
+      "pokemon_total": {
+        "type": "XPATH",
+        "path": "(//div[starts-with(@id,'tab-basic-')])[1]//h2[.='Base stats']/following-sibling::div[1]//tfoot//tr[th='Total']/td[1]//text()"
+      }
+    }
+  }
+]
