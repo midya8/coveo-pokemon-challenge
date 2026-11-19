@@ -7,9 +7,14 @@ import { SearchBox } from '../components/SearchBox';
 import { Pager, QuerySummary, SortSelect } from '../components/SearchChrome';
 import { TypeBadge } from '../components/TypeBadge';
 import { FIELDS, GENERATION_ORDER, IS_SAMPLE_ORG } from '../coveo/config';
+import { generationFacetOptions, typeFacetOptions } from '../coveo/facetOptions';
 import { searchEngine } from '../coveo/engine';
 
 let firstSearchDone = false;
+
+// Module scope so the facet controllers are not rebuilt on every render.
+const typeFacet = typeFacetOptions(FIELDS.type);
+const generationFacet = generationFacetOptions(FIELDS.generation, IS_SAMPLE_ORG ? undefined : GENERATION_ORDER);
 
 export function SearchPage() {
   // Keep search state in the URL hash so searches are shareable and survive Back from a detail page.
@@ -49,18 +54,12 @@ export function SearchPage() {
         <aside className="facets">
           <Facet
             engine={searchEngine}
-            facetId="type"
-            field={FIELDS.type}
+            options={typeFacet}
             title="Type"
+            hint={typeFacet.resultsMustMatch === 'allValues' ? 'Match all selected types.' : undefined}
             renderValue={IS_SAMPLE_ORG ? undefined : (v) => <TypeBadge type={v} />}
           />
-          <Facet
-            engine={searchEngine}
-            facetId="generation"
-            field={FIELDS.generation}
-            title="Generation"
-            customSort={IS_SAMPLE_ORG ? undefined : GENERATION_ORDER}
-          />
+          <Facet engine={searchEngine} options={generationFacet} title="Generation" />
         </aside>
         <main className="results-pane">
           <div className="results-header">

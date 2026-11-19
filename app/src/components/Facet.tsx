@@ -1,37 +1,26 @@
-import { buildFacet, type SearchEngine } from '@coveo/headless';
+import { buildFacet, type FacetOptions, type SearchEngine } from '@coveo/headless';
 import { useMemo } from 'react';
 import { useController } from '../hooks/useController';
 
 interface Props {
   engine: SearchEngine;
-  facetId: string;
-  field: string;
+  /** Stable options object. A new object each render would rebuild the controller. */
+  options: FacetOptions;
   title: string;
-  /** Optional fixed display order (e.g. Generation 1..10). */
-  customSort?: string[];
+  /** Short explanation of how selected values combine. */
+  hint?: string;
   renderValue?: (value: string) => React.ReactNode;
 }
 
-export function Facet({ engine, facetId, field, title, customSort, renderValue }: Props) {
-  const controller = useMemo(
-    () =>
-      buildFacet(engine, {
-        options: {
-          facetId,
-          field,
-          numberOfValues: 20,
-          sortCriteria: customSort ? 'alphanumeric' : 'occurrences',
-          customSort,
-        },
-      }),
-    [engine, facetId, field, customSort],
-  );
+export function Facet({ engine, options, title, hint, renderValue }: Props) {
+  const controller = useMemo(() => buildFacet(engine, { options }), [engine, options]);
+  const facetId = options.facetId ?? options.field;
   const state = useController(controller);
 
   if (!state.values.length) return null;
 
   return (
-    <section className="facet" aria-labelledby={`${facetId}-title`}>
+    <section className="facet" aria-labelledby={`${facetId}-title`} aria-describedby={hint ? `${facetId}-hint` : undefined}>
       <header>
         <h3 id={`${facetId}-title`}>{title}</h3>
         {state.hasActiveValues && (
@@ -40,6 +29,11 @@ export function Facet({ engine, facetId, field, title, customSort, renderValue }
           </button>
         )}
       </header>
+      {hint ? (
+        <p id={`${facetId}-hint`} className="facet-hint">
+          {hint}
+        </p>
+      ) : null}
       <ul>
         {state.values.map((v) => (
           <li key={v.value}>
