@@ -54,7 +54,7 @@ export function PokemonPage() {
     <Page>
       <article className="detail">
         <div className="detail-art">
-          {raw.pokemon_image ? <img src={raw.pokemon_image as string} alt={name} /> : null}
+          {raw.pokemon_image ? <img src={raw.pokemon_image as string} alt={name ?? slug} width={400} height={400} /> : null}
         </div>
         <div className="detail-body">
           {raw.pokemon_number !== undefined && Number(raw.pokemon_number) !== 0 && (
