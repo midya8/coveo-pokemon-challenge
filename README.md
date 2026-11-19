@@ -38,7 +38,7 @@ flowchart LR
 | Path | Role |
 |---|---|
 | [`app/`](app/) | Search UI. Headless owns query state, analytics, and the Search API. React owns markup and routing. |
-| [`coveo-config/`](coveo-config/) | Source settings, web-scraping config, field definitions, and the query-pipeline statements. |
+| [`coveo-config/`](coveo-config/) | Source settings, web-scraping config, field definitions, and the query-pipeline statements. The field-by-field catalog is [docs/FIELDS.md](docs/FIELDS.md). |
 | [`tools/`](tools/) | Scraping validator, org setup, analytics seeding, pipeline apply, and an index check for the Fire + Flying demo. |
 
 Headless rather than Atomic: the result card (artwork, types, stats), the generation facet in natural order (`Generation 1` … `Generation 10`), and the `/pokemon/:slug` detail route are all custom. Atomic would have meant fighting its result template and router. The engine uses `getOrganizationEndpoints` so search and analytics follow the org’s regional endpoints.
