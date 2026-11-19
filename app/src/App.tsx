@@ -20,7 +20,7 @@ function RememberSearchHash() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <RememberSearchHash />
       <header className="site-header">
         <Link to="/" className="brand">
