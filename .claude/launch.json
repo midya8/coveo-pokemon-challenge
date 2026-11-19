@@ -3,9 +3,15 @@
   "configurations": [
     {
       "name": "pokedex-app",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "app", "run", "dev", "--", "--port", "5173", "--strictPort"],
+      "runtimeExecutable": "/Users/midyarahmani/.local/bin/bws",
+      "runtimeArgs": ["run", "--", "npm", "--prefix", "app", "run", "dev", "--", "--port", "5173", "--strictPort"],
       "port": 5173
+    },
+    {
+      "name": "pokedex-app-sample",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "app", "run", "dev", "--", "--port", "5174", "--strictPort"],
+      "port": 5174
     }
   ]
 }
