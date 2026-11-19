@@ -82,8 +82,31 @@ bws run -- tools/.venv/bin/python -I tools/coveo_setup.py mappings "Pokemon" # m
 - **Be polite to the site.** pokemondb's robots.txt sets `Crawl-delay: 2`, so the request interval is
   2,000 ms. That costs about 35 minutes per full rebuild, but it's the correct way to crawl someone else's site.
 
+## Query pipeline
+**`Pokemon Search`**, with the condition *Search Hub is `PokemonSearch`*. The app sends that search hub,
+so every query from the app goes through this pipeline, and the ML models are associated with it rather
+than with `default`.
+
+## Query Suggestions: seeding a cold-start org
+QS models learn only from analytics: queries followed by a click, with at least 100 events. A new
+org has none, so [`tools/seed_analytics.py`](../tools/seed_analytics.py) simulates visitors on the
+`PokemonSearch` hub:
+- one *name journey* per indexed Pokémon (search "pikachu", open Pikachu's page), 2 visitors each
+- *topic journeys* ("fire type", "legendary pokemon", "eevee evolutions"…) run against the live index;
+  the visitor opens the top hit, or sometimes the second, 8 visitors each
+
+The events use the UA v15 API with a synthetic user agent (`pokemon-challenge-seed/1.0`), so they're
+easy to filter out later. In a real deployment, you'd turn on the model's *Test configuration mode*
+(sandbox orgs only) or let real traffic build up.
+
+## RGA: blocked by the trial license
+The self-serve trial does not include Relevance Generative Answering. Creating the model shows
+*"You don't have the required license to create a model of this type."* The app's generated-answer
+panel is already wired up (`buildGeneratedAnswer`) and will render once Coveo enables RGA on the org.
+I asked Will Tseng for RGA and Passage Retrieval on `voljzmfhemcvoorg`.
+
 ## Still to do
-- [ ] Query Suggest model (Advanced)
-- [ ] RGA model on the Pokémon source (Advanced)
-- [ ] Send the Org ID to Will to get Passage Retrieval enabled (Bonus)
-- [ ] Query pipeline filter instead of the app-side `cq` that hides the test source
+- [ ] Query Suggest model: create it after seeding and associate it with `Pokemon Search`
+- [ ] RGA model: waiting on a license from Coveo
+- [ ] Passage Retrieval (Bonus): waiting on Coveo to enable it
+- [ ] Pipeline filter rule instead of the app-side `cq` that hides the test source

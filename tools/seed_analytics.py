@@ -79,6 +79,12 @@ def post(url: str, body: dict) -> tuple[int, dict | None]:
                 time.sleep(2 ** attempt)
                 continue
             return e.code, {"error": e.read().decode(errors="replace")[:300]}
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+            # Transient network/DNS hiccups: back off and retry, never crash the whole run.
+            if attempt < 3:
+                time.sleep(2 ** attempt)
+                continue
+            return 0, {"error": str(e)[:200]}
     return 0, None
 
 
