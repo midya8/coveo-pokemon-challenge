@@ -3,6 +3,8 @@
 A Coveo-powered search experience over [pokemondb.net](https://pokemondb.net), built with
 **Coveo Headless + React**.
 
+**Live demo:** https://midya8.github.io/coveo-pokemon-challenge/
+
 | Folder | What's in it |
 |---|---|
 | [`coveo-config/`](coveo-config/) | Org setup: source settings, web scraping config, field definitions |
@@ -41,8 +43,8 @@ tools/.venv/bin/python -I tools/validate_scraping.py --sitemap bulbasaur chariza
 - [ ] Org: create fields and sources, rebuild, connect the app *(waiting on org access)*
 
 **Intermediate**
-- [ ] GitHub repo
-- [ ] Hosting
+- [x] GitHub repo
+- [x] Hosting: GitHub Pages, deployed with `bws run -- ./app/scripts/deploy.sh`
 
 **Advanced**
 - [x] Pokémon detail page (`/pokemon/:slug`, loaded from the index)
