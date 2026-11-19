@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { TypeBadge } from '../components/TypeBadge';
 import { asList } from '../coveo/fields';
-import { FIELDS_TO_INCLUDE, IS_SAMPLE_ORG, POKEDEX_URL_PREFIX } from '../coveo/config';
+import { FIELDS_TO_INCLUDE, IS_SAMPLE_ORG, POKEDEX_URL_PREFIX, SOURCE_FILTER } from '../coveo/config';
 import { createEngine } from '../coveo/engine';
 import { useController } from '../hooks/useController';
 
@@ -25,7 +25,10 @@ export function PokemonPage() {
   const resultList = useMemo(() => {
     const engine = createEngine();
     const { registerAdvancedSearchQueries } = loadAdvancedSearchQueryActions(engine);
-    engine.dispatch(registerAdvancedSearchQueries({ aq: `@uri=="${uri.replace(/"/g, '')}"` }));
+    // Re-state the source filter too: registering advanced queries replaces the whole set.
+    engine.dispatch(
+      registerAdvancedSearchQueries({ aq: `@uri=="${uri.replace(/"/g, '')}"`, cq: SOURCE_FILTER }),
+    );
     const list = buildResultList(engine, { options: { fieldsToInclude: FIELDS_TO_INCLUDE } });
     engine.executeFirstSearch();
     return list;

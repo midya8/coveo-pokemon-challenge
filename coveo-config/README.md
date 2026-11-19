@@ -52,9 +52,38 @@ Metadata names in the scraping config match the field names, so mapping is autom
 Site header, nav and footer, the sprite gallery and the other-languages table. This keeps each
 indexed body focused on Pokédex content, which also gives RGA cleaner passages to work from.
 
-## Still to do in the org (needs org access)
-- [ ] Create the fields above, then the Sitemap source(s), then rebuild
-- [ ] Create a search API key (search only, anonymous), stored in Bitwarden Secrets Manager
-- [ ] Query pipeline + Query Suggest model (Advanced)
+## Org setup (trial org `voljzmfhemcvoorg`)
+
+Done with [`tools/coveo_setup.py`](../tools/coveo_setup.py), using an admin key from Bitwarden that can
+edit fields and sources and view the org:
+
+```bash
+bws run -- tools/.venv/bin/python -I tools/coveo_setup.py fields             # create the 17 fields
+bws run -- tools/.venv/bin/python -I tools/coveo_setup.py mappings "Pokemon" # metadata -> field mappings
+```
+
+| Resource | Status |
+|---|---|
+| 17 `pokemon_*` fields | Created by script and verified |
+| `Pokemon TEST - single page` (Sitemap) | Bulbasaur only. All 17 fields indexed and verified in "View and map metadata" |
+| `Pokemon - pokemondb.net` (Sitemap) | Duplicate of the test source with the full regex filter and a 2,000 ms request interval |
+| Search key (Anonymous search template) | Bitwarden secret `VITE_COVEO_API_KEY` |
+
+## Lessons learned (for the panel)
+- **Scraped metadata isn't indexed without a mapping.** The crawler extracted all 17 values, but they
+  showed "Not indexed" until each source had a mapping rule `pokemon_x ← %[pokemon_x]`. Having a field
+  with the same name wasn't enough. The script now adds these mappings to any source in one command.
+- **Facet and multi-value facet are mutually exclusive** on a field, and a multi-value field needs a
+  tokenizer (`;`). The API returns a clear 412 for both. The Admin Console hides this behind toggles.
+- **The Coveo API edge firewall** blocked requests sent with Python's default User-Agent, and a
+  description containing `Height (`. The fixes were a named User-Agent and a reworded description.
+- **Test with a single-page source first.** It rebuilds in seconds. Duplicating it into the full
+  source carries over the scraping config and mappings, so the two can't drift apart.
+- **Be polite to the site.** pokemondb's robots.txt sets `Crawl-delay: 2`, so the request interval is
+  2,000 ms. That costs about 35 minutes per full rebuild, but it's the correct way to crawl someone else's site.
+
+## Still to do
+- [ ] Query Suggest model (Advanced)
 - [ ] RGA model on the Pokémon source (Advanced)
 - [ ] Send the Org ID to Will to get Passage Retrieval enabled (Bonus)
+- [ ] Query pipeline filter instead of the app-side `cq` that hides the test source

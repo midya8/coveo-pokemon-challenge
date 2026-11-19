@@ -40,7 +40,7 @@ export function SearchPage() {
     <div className="search-page">
       {IS_SAMPLE_ORG && (
         <p className="notice sample">
-          Running against Coveo’s public sample org. Set <code>VITE_COVEO_ORG_ID</code> /{' '}
+          Running against Coveo’s public sample org. Set{' '}
           <code>VITE_COVEO_API_KEY</code> (via <code>bws run</code>) to search the Pokémon index.
         </p>
       )}

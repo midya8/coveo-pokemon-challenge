@@ -1,20 +1,26 @@
 /**
  * Coveo connection + field mapping.
  *
- * Credentials come from env vars injected at dev/build time (never committed):
+ * The org ID is not a secret. The search API key is injected at dev/build time from
+ * Bitwarden Secrets Manager and never committed:
  *   bws run -- npm run dev
- * with Bitwarden secrets named VITE_COVEO_ORG_ID and VITE_COVEO_API_KEY.
+ * (secret name: VITE_COVEO_API_KEY, an "Anonymous search" key, safe to ship to browsers).
  *
- * Without them the app falls back to Coveo's public sample org so the UI can be
- * developed before the Pokémon org exists. Field mapping switches accordingly.
+ * Without the key the app falls back to Coveo's public sample org so the UI still runs.
  */
 
-export const ORG_ID: string | undefined = import.meta.env.VITE_COVEO_ORG_ID;
+export const ORG_ID: string = import.meta.env.VITE_COVEO_ORG_ID ?? 'voljzmfhemcvoorg';
 export const API_KEY: string | undefined = import.meta.env.VITE_COVEO_API_KEY;
 export const SEARCH_HUB: string = import.meta.env.VITE_COVEO_SEARCH_HUB ?? 'PokemonSearch';
 export const PIPELINE: string | undefined = import.meta.env.VITE_COVEO_PIPELINE;
 
-export const IS_SAMPLE_ORG = !ORG_ID || !API_KEY;
+export const IS_SAMPLE_ORG = !API_KEY;
+
+/**
+ * Constant query: only the production source. The org also has a single-page test source
+ * used to iterate on the scraping config, which would otherwise show up as a duplicate.
+ */
+export const SOURCE_FILTER = '@source=="Pokemon - pokemondb.net"';
 
 export const FIELDS = IS_SAMPLE_ORG
   ? {

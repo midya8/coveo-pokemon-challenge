@@ -1,0 +1,19 @@
+[
+  { "name": "pokemon_name", "type": "STRING", "description": "Pokémon name", "sort": true, "mergeWithLexicon": true },
+  { "name": "pokemon_number", "type": "LONG", "description": "National Pokédex number (empty for unreleased Gen 10)", "sort": true },
+  { "name": "pokemon_type", "type": "STRING", "description": "Pokémon type(s), e.g. Grass, Poison", "multiValueFacet": true, "multiValueFacetTokenizers": ";", "mergeWithLexicon": true },
+  { "name": "pokemon_generation", "type": "STRING", "description": "Generation introduced, e.g. Generation 1", "facet": true },
+  { "name": "pokemon_image", "type": "STRING", "description": "Official artwork URL (og:image)" },
+  { "name": "pokemon_species", "type": "STRING", "description": "Species, e.g. Seed Pokémon", "mergeWithLexicon": true },
+  { "name": "pokemon_height", "type": "STRING", "description": "Height, metric and imperial" },
+  { "name": "pokemon_weight", "type": "STRING", "description": "Weight (metric and imperial)" },
+  { "name": "pokemon_abilities", "type": "STRING", "description": "Abilities, including hidden ability", "multiValueFacet": true, "multiValueFacetTokenizers": ";", "mergeWithLexicon": true },
+  { "name": "pokemon_forms", "type": "STRING", "description": "Alternate forms (Mega, regional, etc.)", "multiValueFacet": true, "multiValueFacetTokenizers": ";", "mergeWithLexicon": true },
+  { "name": "pokemon_hp", "type": "LONG", "description": "Base stat: HP", "sort": true },
+  { "name": "pokemon_attack", "type": "LONG", "description": "Base stat: Attack", "sort": true },
+  { "name": "pokemon_defense", "type": "LONG", "description": "Base stat: Defense", "sort": true },
+  { "name": "pokemon_sp_atk", "type": "LONG", "description": "Base stat: Special Attack", "sort": true },
+  { "name": "pokemon_sp_def", "type": "LONG", "description": "Base stat: Special Defense", "sort": true },
+  { "name": "pokemon_speed", "type": "LONG", "description": "Base stat: Speed", "sort": true },
+  { "name": "pokemon_total", "type": "LONG", "description": "Base stat total", "sort": true }
+]
