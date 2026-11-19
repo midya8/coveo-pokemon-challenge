@@ -1,4 +1,5 @@
 import type { FacetOptions, FacetResultsMustMatch } from '@coveo/headless';
+import { FIELDS, GENERATION_ORDER, IS_SAMPLE_ORG } from './config';
 
 /**
  * How a facet combines selected values.
@@ -43,3 +44,11 @@ export function abilitiesFacetOptions(field: string): FacetOptions {
     resultsMustMatch: ANY,
   };
 }
+
+/** Stable objects so facet controllers are not rebuilt on every render. */
+export const typeFacet = typeFacetOptions(FIELDS.type);
+export const generationFacet = generationFacetOptions(
+  FIELDS.generation,
+  IS_SAMPLE_ORG ? undefined : GENERATION_ORDER,
+);
+export const abilitiesFacet = IS_SAMPLE_ORG ? undefined : abilitiesFacetOptions('pokemon_abilities');

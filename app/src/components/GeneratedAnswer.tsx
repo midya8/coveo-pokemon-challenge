@@ -16,7 +16,7 @@ export function GeneratedAnswer({ engine }: { engine: SearchEngine }) {
   );
   const s = useController(controller);
 
-  if (!s.isVisible || (!s.answer && !s.isStreaming && !s.isLoading)) return null;
+  if (s.error || !s.isVisible || (!s.answer && !s.isStreaming && !s.isLoading)) return null;
 
   return (
     <section className="generated-answer" aria-live="polite">

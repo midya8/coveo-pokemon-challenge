@@ -99,14 +99,19 @@ The events use the UA v15 API with a synthetic user agent (`pokemon-challenge-se
 easy to filter out later. In a real deployment, you'd turn on the model's *Test configuration mode*
 (sandbox orgs only) or let real traffic build up.
 
-## RGA: blocked by the trial license
-The self-serve trial does not include Relevance Generative Answering. Creating the model shows
-*"You don't have the required license to create a model of this type."* The app's generated-answer
-panel is already wired up (`buildGeneratedAnswer`) and will render once Coveo enables RGA on the org.
-I asked Will Tseng for RGA and Passage Retrieval on `voljzmfhemcvoorg`.
+## RGA and Passage Retrieval: not on this trial
+The trial license cannot create a Relevance Generative Answering model, and
+`/rest/search/v3/passages/retrieve` returns 403 `UNAUTHORIZED_ACCESS_TO_FEATURE`.
+The app mounts both panels and, when the platform refuses them, shows a note
+instead of a search error. A successful payload renders as soon as the license allows it.
+
+## Query pipeline rules
+[`pipeline.json`](pipeline.json) is the thesaurus, featured result, ranking expression,
+and production-source filter. Apply it with [`tools/apply_pipeline.py`](../tools/apply_pipeline.py).
+The command is a dry run unless `--apply` is passed, and it never deletes statements.
 
 ## Still to do
-- [ ] Query Suggest model: create it after seeding and associate it with `Pokemon Search`
-- [ ] RGA model: waiting on a license from Coveo
-- [ ] Passage Retrieval (Bonus): waiting on Coveo to enable it
-- [ ] Pipeline filter rule instead of the app-side `cq` that hides the test source
+- [ ] Run `apply_pipeline.py --apply` with an admin key (the JSON is in the repo; it is not applied by CI)
+- [ ] RGA model, once the license includes it
+- [ ] Passage Retrieval, once the license includes it
+- [x] Query Suggest model associated with `Pokemon Search` (learned queries complete; unknown phrases fall back to instant results in the UI)
