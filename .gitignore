@@ -9,6 +9,9 @@ dist/
 tools/.venv/
 tools/.cache/
 __pycache__/
+test-results/
+playwright-report/
+blob-report/
 
 # Private notes (interview details) - never publish
 HANDOFF.md
