@@ -15,6 +15,8 @@ The panel path is a conjunctive type filter, then a name search that survives a 
 5. Search `charizard`, or a phrase the Query Suggestions model has not learned (for example `xyznotapokemon`). Learned queries show ML suggestions. An empty suggestion list falls back to instant results from the index instead of a blank dropdown.
 6. **Ability** and **Generation** are ordinary disjunctive facets. **Sort** can order by relevance, Pokédex number, name, or base stat total.
 
+The timed version, with a fallback for each failure, is [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
+
 Passage Retrieval is not licensed on this trial. The results column says so, in a note, after a single probe. It does not raise a search error. Relevance Generative Answering renders only when the pipeline returns an answer. On this org it stays hidden.
 
 ## Architecture
