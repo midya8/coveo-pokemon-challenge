@@ -14,7 +14,7 @@ import ssl
 import sys
 import urllib.request
 
-ORG_ID = os.environ.get("COVEO_ORG_ID", os.environ.get("VITE_COVEO_ORG_ID", "voljzmfhemcvoorg"))
+ORG_ID = os.environ.get("COVEO_ORG_ID", os.environ.get("VITE_COVEO_ORG_ID", "agsqwaoevfcvoorg"))
 SEARCH_HUB = os.environ.get("VITE_COVEO_SEARCH_HUB", "PokemonSearch")
 
 

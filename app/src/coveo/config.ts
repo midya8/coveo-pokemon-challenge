@@ -9,7 +9,7 @@
  * Without the key the app falls back to Coveo's public sample org so the UI still runs.
  */
 
-export const ORG_ID: string = import.meta.env.VITE_COVEO_ORG_ID ?? 'voljzmfhemcvoorg';
+export const ORG_ID: string = import.meta.env.VITE_COVEO_ORG_ID ?? 'agsqwaoevfcvoorg';
 export const API_KEY: string | undefined = import.meta.env.VITE_COVEO_API_KEY;
 export const SEARCH_HUB: string = import.meta.env.VITE_COVEO_SEARCH_HUB ?? 'PokemonSearch';
 export const PIPELINE: string | undefined = import.meta.env.VITE_COVEO_PIPELINE;

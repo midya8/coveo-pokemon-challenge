@@ -24,7 +24,7 @@ import certifi
 ROOT = Path(__file__).resolve().parent.parent
 FIELDS_FILE = ROOT / "coveo-config" / "fields.json"
 PLATFORM = "https://platform.cloud.coveo.com"
-ORG_ID = os.environ.get("COVEO_ORG_ID", "voljzmfhemcvoorg")
+ORG_ID = os.environ.get("COVEO_ORG_ID", "agsqwaoevfcvoorg")
 SSL_CTX = ssl.create_default_context(cafile=certifi.where())
 
 # Defaults applied to every field unless fields.json overrides them.

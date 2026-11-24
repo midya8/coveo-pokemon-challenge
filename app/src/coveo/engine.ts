@@ -39,8 +39,32 @@ export function engineConfiguration(input: EngineConfigInput): SearchEngineConfi
       originContext: 'Search',
       anonymous: true,
     },
+    preprocessRequest: withPartialMatch,
   };
 }
+
+/**
+ * Natural-language questions ("what does sprigatito evolve into") contain words the page
+ * doesn't, and Coveo requires every keyword by default, so they returned nothing and RGA had
+ * nothing to ground on. Partial match keeps results when at least half of 3+ keywords match.
+ * (The v1 pipeline statements API rejects `override query`, so this lives in the client.)
+ */
+export const withPartialMatch: NonNullable<SearchEngineConfiguration['preprocessRequest']> = (request, clientOrigin) => {
+  if (clientOrigin !== 'searchApiFetch' || typeof request.body !== 'string') return request;
+  try {
+    const body = JSON.parse(request.body) as Record<string, unknown>;
+    if (typeof body.q !== 'string' || !body.q.trim()) return request;
+    request.body = JSON.stringify({
+      ...body,
+      partialMatch: true,
+      partialMatchKeywords: 3,
+      partialMatchThreshold: '50%',
+    });
+  } catch {
+    /* not a JSON search body: leave it untouched */
+  }
+  return request;
+};
 
 function configuration(): SearchEngineConfiguration {
   return engineConfiguration({
