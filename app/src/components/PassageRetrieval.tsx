@@ -2,7 +2,7 @@ import { buildQuerySummary } from '@coveo/headless';
 import { useEffect, useMemo, useState } from 'react';
 import { API_KEY, IS_SAMPLE_ORG, ORG_ID, SEARCH_HUB } from '../coveo/config';
 import { searchEngine } from '../coveo/engine';
-import { interpretPassageResponse, type PassageInterpretation } from '../coveo/passages';
+import { interpretPassageResponse, passageExcerpt, type PassageInterpretation } from '../coveo/passages';
 import { useController } from '../hooks/useController';
 import { UnavailableNotice } from './UnavailableNotice';
 
@@ -59,8 +59,9 @@ export function PassageRetrieval() {
         <ul>
           {status.passages.map((passage) => (
             <li key={`${passage.uri ?? ''}-${passage.text.slice(0, 40)}`}>
-              {passage.title && <strong>{passage.title}. </strong>}
-              {passage.text}
+              {passage.title && <strong>{passage.title}: </strong>}
+              {passageExcerpt(passage.text, query)}
+              <span className="passage-meta">Excerpt of a {passage.text.length.toLocaleString('en-US')}-character passage</span>
             </li>
           ))}
         </ul>
