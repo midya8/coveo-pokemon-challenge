@@ -20,7 +20,7 @@ export default defineConfig({
     url: `http://127.0.0.1:${port}`,
     reuseExistingServer: !process.env.CI,
     env: {
-      VITE_COVEO_ORG_ID: 'voljzmfhemcvoorg',
+      VITE_COVEO_ORG_ID: 'agsqwaoevfcvoorg',
       VITE_COVEO_API_KEY: 'playwright-not-a-real-key',
       VITE_COVEO_SEARCH_HUB: 'PokemonSearch',
     },

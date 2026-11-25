@@ -6,7 +6,7 @@ Dry-run is the default. Pass --apply to write, after each change has been
 validated by the Platform API.
 
   python tools/apply_pipeline.py
-  COVEO_ADMIN_API_KEY=... python tools/apply_pipeline.py --apply
+  bws run -- tools/.venv/bin/python -I tools/apply_pipeline.py --apply
 
 The admin key is read from the environment and is never printed.
 """
@@ -28,7 +28,7 @@ from pipeline_plan import plan  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 PIPELINE_FILE = ROOT / "coveo-config" / "pipeline.json"
 PLATFORM = "https://platform.cloud.coveo.com"
-ORG_ID = os.environ.get("COVEO_ORG_ID", "voljzmfhemcvoorg")
+ORG_ID = os.environ.get("COVEO_ORG_ID", "agsqwaoevfcvoorg")
 PIPELINE_NAME = "Pokemon Search"
 
 
@@ -87,7 +87,7 @@ def as_list(payload: object, keys: tuple[str, ...]) -> list[dict]:
 def find_pipeline_id() -> str:
     errors: list[str] = []
     for path in (
-        "/rest/search/v2/admin/pipelines?perPage=100",
+        "/rest/search/v1/admin/pipelines?perPage=100",
         f"/rest/organizations/{ORG_ID}/pipelines",
     ):
         try:
@@ -107,7 +107,7 @@ def list_statements(pipeline_id: str) -> list[dict]:
     while True:
         payload = api(
             "GET",
-            f"/rest/search/v2/admin/pipelines/{pipeline_id}/statements?page={page}&perPage=100",
+            f"/rest/search/v1/admin/pipelines/{pipeline_id}/statements?page={page}&perPage=100",
         )
         batch = as_list(payload, ("statements", "items", "results"))
         statements.extend(batch)
@@ -136,7 +136,7 @@ def validate(pipeline_id: str, operation: str, model: dict, resource_id: str | N
     body = {"operation": {"operationType": operation, "model": model}}
     if resource_id:
         body["operation"]["resourceId"] = resource_id
-    result = api("POST", f"/rest/search/v2/admin/pipelines/{pipeline_id}/statements/validate", body)
+    result = api("POST", f"/rest/search/v1/admin/pipelines/{pipeline_id}/statements/validate", body)
     if not isinstance(result, dict) or result.get("operationValid") is False:
         raise SystemExit(f"validation failed for {model['description']}: {json.dumps(result)[:800]}")
 
@@ -153,7 +153,7 @@ def apply_actions(pipeline_id: str, actions: list[dict], write: bool) -> int:
         model = model_for(action, ids)
         if verb == "create":
             validate(pipeline_id, "CREATE", model)
-            created = api("POST", f"/rest/search/v2/admin/pipelines/{pipeline_id}/statements", model)
+            created = api("POST", f"/rest/search/v1/admin/pipelines/{pipeline_id}/statements", model)
             new_id = created.get("id") if isinstance(created, dict) else None
             if not new_id:
                 raise SystemExit(f"create returned no id for {action['description']}")
@@ -161,7 +161,7 @@ def apply_actions(pipeline_id: str, actions: list[dict], write: bool) -> int:
             print(f"       created {new_id}")
         elif verb == "update":
             validate(pipeline_id, "UPDATE", model, action["id"])
-            api("PUT", f"/rest/search/v2/admin/pipelines/{pipeline_id}/statements/{action['id']}", model)
+            api("PUT", f"/rest/search/v1/admin/pipelines/{pipeline_id}/statements/{action['id']}", model)
             print(f"       updated {action['id']}")
         else:
             raise SystemExit(f"unexpected action {verb}")

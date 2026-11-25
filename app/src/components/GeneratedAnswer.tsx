@@ -1,4 +1,5 @@
 import { buildGeneratedAnswer, type SearchEngine } from '@coveo/headless';
+import { renderMarkdownLite } from './markdownLite';
 import { useMemo } from 'react';
 import { useController } from '../hooks/useController';
 
@@ -11,6 +12,8 @@ export function GeneratedAnswer({ engine }: { engine: SearchEngine }) {
     () =>
       buildGeneratedAnswer(engine, {
         fieldsToIncludeInCitations: ['pokemon_name', 'pokemon_image'],
+        // RGA answers in Markdown; renderMarkdownLite turns it into React elements (no raw HTML).
+        initialState: { responseFormat: { answerStyle: 'default', contentFormat: ['text/markdown', 'text/plain'] } },
       }),
     [engine],
   );
@@ -41,7 +44,7 @@ export function GeneratedAnswer({ engine }: { engine: SearchEngine }) {
       {s.isLoading && !s.answer ? (
         <p className="ga-loading">Thinking…</p>
       ) : (
-        <p className="ga-answer">{s.answer}</p>
+        <div className="ga-answer">{renderMarkdownLite(s.answer ?? '')}</div>
       )}
       {s.citations.length > 0 && (
         <ol className="ga-citations">

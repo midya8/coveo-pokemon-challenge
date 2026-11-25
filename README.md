@@ -1,6 +1,6 @@
 # Pokédex Search
 
-A Coveo Headless search experience over the national Pokédex pages on [pokemondb.net](https://pokemondb.net). The index is the Coveo trial organization `voljzmfhemcvoorg`. The interface is a Vite + React 19 app using `@coveo/headless` 3.4.1.
+A Coveo Headless search experience over the national Pokédex pages on [pokemondb.net](https://pokemondb.net). The index is the Coveo organization `agsqwaoevfcvoorg`, provisioned by Coveo for the challenge (migrated from a self-serve trial, `voljzmfhemcvoorg`, with `tools/import_source.py`). The interface is a Vite + React 19 app using `@coveo/headless` 3.4.1.
 
 **Live demo:** https://midya8.github.io/coveo-pokemon-challenge/
 
@@ -17,7 +17,7 @@ The panel path is a conjunctive type filter, then a name search that survives a 
 
 The timed version, with a fallback for each failure, is [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
 
-Passage Retrieval is not licensed on this trial. The results column says so, in a note, after a single probe. It does not raise a search error. Relevance Generative Answering renders only when the pipeline returns an answer. On this org it stays hidden.
+On Coveo's org, **Relevance Generative Answering** answers natural-language questions above the results (for example *what does bulbasaur evolve into* or *what type is lucario*), with citations. The answer's Markdown is rendered as React elements, never as raw HTML. **Passage Retrieval** shows the passages an external LLM or agent would receive for the current query. Its API needs a Passage Retrieval model *and* a Semantic Encoder on the pipeline.
 
 ## Architecture
 
@@ -36,7 +36,7 @@ flowchart LR
   Pipe --> Idx["Sitemap source<br/>Pokemon - pokemondb.net"]
   UA --> QS[Query Suggestions]
   QS --> Pipe
-  Pipe -.->|not licensed| Extra[RGA and Passage Retrieval]
+  Pipe --> ML["RGA, Semantic Encoder, Passage Retrieval"]
 ```
 
 | Path | Role |
@@ -51,9 +51,8 @@ Headless rather than Atomic: the result card (artwork, types, stats), the genera
 
 ```bash
 cd app
-cp .env.example .env          # then set VITE_COVEO_API_KEY
 npm install
-npm run dev
+bws run -- npm run dev     # injects VITE_COVEO_API_KEY from Bitwarden Secrets Manager
 ```
 
 Without a search token the UI still boots, against Coveo’s public sample organization. Pokémon fields, the type facet, and the detail page need the trial org.
@@ -74,20 +73,20 @@ python3 -m venv tools/.venv && tools/.venv/bin/pip install -r tools/requirements
 tools/.venv/bin/python -I tools/validate_scraping.py --sitemap bulbasaur charizard
 ```
 
-GitHub Pages is still `app/scripts/deploy.sh`. It builds with `--base="/<repo>/"`, copies `index.html` to `404.html` so `/pokemon/<slug>` deep links load, and pushes the `gh-pages` branch. Inject `VITE_COVEO_ORG_ID` and `VITE_COVEO_API_KEY` in the environment before running it. A build without them publishes the sample-org fallback.
+GitHub Pages is still `app/scripts/deploy.sh`. It builds with `--base="/<repo>/"`, copies `index.html` to `404.html` so `/pokemon/<slug>` deep links load, and pushes the `gh-pages` branch. Run it as `bws run -- ./app/scripts/deploy.sh` so the search key comes from Bitwarden. A build without them publishes the sample-org fallback.
 
 ## Environment
 
 | Variable | Where | Purpose |
 |---|---|---|
-| `VITE_COVEO_ORG_ID` | `app/.env` | Trial org. Defaults to `voljzmfhemcvoorg`. Not a secret. |
-| `VITE_COVEO_API_KEY` | `app/.env` | Anonymous **search** token (Execute Queries). Vite inlines it into the browser bundle. |
+| `VITE_COVEO_ORG_ID` | optional | Defaults to `agsqwaoevfcvoorg`. Not a secret. |
+| `VITE_COVEO_API_KEY` | Bitwarden (`bws run`) | Anonymous **search** token (Execute Queries). Vite inlines it into the browser bundle. |
 | `VITE_COVEO_SEARCH_HUB` | `app/.env` | Defaults to `PokemonSearch`, which is the condition on the Pokemon Search pipeline. |
 | `VITE_COVEO_PIPELINE` | `app/.env` | Leave empty. The hub condition chooses the pipeline. Set it only to override that. |
 | `COVEO_ADMIN_API_KEY` | shell only | Platform admin token for `tools/coveo_setup.py` and `tools/apply_pipeline.py`. Never prefix it with `VITE_`. |
 | `COVEO_ORG_ID` | shell only | Optional override for the Python tools. |
 
-Do not commit `.env`. `app/.env.example` lists the names and nothing else.
+Secrets live only in Bitwarden Secrets Manager and are injected with `bws run`. Never write them to `.env` or commit them. `app/.env.example` lists the variable names and nothing else.
 
 ## Why the Type facet is conjunctive
 
@@ -99,13 +98,13 @@ An advanced query (`aq`) would have filtered the results but fought the facet co
 
 Facet counts on the Type facet stay the counts for that facet ignoring its own selection, which is how Coveo lets you keep browsing values. The result summary is the conjunction. The hint under the facet title says so.
 
-## Query suggestions, analytics, and the unlicensed APIs
+## Query suggestions, analytics, RGA, and Passage Retrieval
 
 Usage analytics uses Headless **legacy** mode (Usage Analytics v15). The Query Suggestions model and `tools/seed_analytics.py` learn from that protocol, and the search hub is origin level 1 on every search, click, and facet event. A made-up `trackingId` is not sent: that field belongs to the newer Event Protocol, which would ignore the events this model was trained on. Result clicks go through `buildInteractiveResult` / `buildInteractiveInstantResult`.
 
 The suggestion model already completes popular queries (`charizard`, `fire type`, …). Phrases it has never seen return an empty list. The search box then calls `buildInstantResults` and labels the rows as index matches. Field suggestions were not used for names: `pokemon_name` is sortable, not a facet field, and the values API rejects it with `INVALID_FACET_FIELD`. Promoting it to a facet would take an admin change and a reindex. The type facet is the place to pick Fire and Flying.
 
-`buildGeneratedAnswer` stays mounted. If the controller reports an error, the panel renders nothing rather than the error. `PassageRetrieval` calls `/rest/search/v3/passages/retrieve` once. This org answers `403 UNAUTHORIZED_ACCESS_TO_FEATURE`. The UI shows that as a note and does not call the API again on later searches.
+`buildGeneratedAnswer` stays mounted. If the controller reports an error, the panel renders nothing rather than the error. `PassageRetrieval` calls `/rest/search/v3/passages/retrieve` for each query, with `localization` (required). A 401/403 is remembered for the page's lifetime so an unlicensed org is not probed on every search.
 
 ## Index and pipeline as code
 
@@ -136,7 +135,7 @@ The apply script only touches statements whose description starts with `pokemon-
 ## Known limits
 
 - Query Suggestions return nothing for phrases the model has not learned. Instant results cover that gap. They are not a substitute for a finished model.
-- Relevance Generative Answering is not licensed, and there is no answer configuration on the pipeline.
+- RGA, Passage Retrieval, and the Semantic Encoder are live on `agsqwaoevfcvoorg`. The self-serve trial did not license RGA, and the first RGA model built mid-crawl. It only knew the first ~250 Pokémon, so a duplicate built on the full index replaced it.
 - Passage Retrieval returns 403. The note in the UI is that response, not a hidden feature flag.
 - A few unreleased Pokémon have no national dex number. Those cards omit the number instead of showing `#0000`.
 - The trial org is the whole backend. There is no local index.

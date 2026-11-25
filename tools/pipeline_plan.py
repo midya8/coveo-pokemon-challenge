@@ -55,7 +55,14 @@ def plan(existing: list[dict], wanted: list[dict]) -> list[dict]:
             and _parent_description(current, owned) == statement.get("parentDescription")
         )
         if same:
-            actions.append({"action": "keep", "id": current.get("id"), "description": statement["description"]})
+            actions.append(
+                {
+                    "action": "keep",
+                    "id": current.get("id"),
+                    "feature": statement["feature"],
+                    "description": statement["description"],
+                }
+            )
         else:
             actions.append({"action": "update", "id": current.get("id"), **statement})
     if any(action["action"] == "delete" for action in actions):

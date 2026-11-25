@@ -52,7 +52,19 @@ Metadata names in the scraping config match the field names, so mapping is autom
 Site header, nav and footer, the sprite gallery and the other-languages table. This keeps each
 indexed body focused on Pokédex content, which also gives RGA cleaner passages to work from.
 
-## Org setup (trial org `voljzmfhemcvoorg`)
+## Org setup (`agsqwaoevfcvoorg`)
+
+The org Coveo provisioned for the challenge. Everything was first built on a self-serve trial (`voljzmfhemcvoorg`, which lacked the RGA license) and then moved with the tools below. The source moved as one file: [`source-pokemondb.json`](source-pokemondb.json) is the trial source's raw configuration (sitemap, crawl rules, web scraping, 2,000 ms interval, mappings), imported with `tools/import_source.py`.
+
+```bash
+bws run -- tools/.venv/bin/python -I tools/coveo_setup.py fields
+bws run -- tools/.venv/bin/python -I tools/import_source.py coveo-config/source-pokemondb.json --rebuild
+bws run -- tools/.venv/bin/python -I tools/apply_pipeline.py --apply   # after creating the Pokemon Search pipeline
+```
+
+Pipeline statements go through the v1 admin API (`/rest/search/v1/admin/pipelines`). Featured results and ranking expressions (`top`, `boost`) are rejected there. They are managed under the pipeline's **Result rankings** instead.
+
+### Earlier trial setup
 
 Done with [`tools/coveo_setup.py`](../tools/coveo_setup.py), using an admin key from Bitwarden that can
 edit fields and sources and view the org:
